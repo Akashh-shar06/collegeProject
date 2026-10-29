@@ -1,0 +1,10 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # If request is not already pointing to public/ or collegeProject/public/
+    RewriteCond %{REQUEST_URI} !^/collegeProject/public/
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+Options -Indexes

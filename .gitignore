@@ -1,0 +1,34 @@
+# Environment & credentials
+.env
+.env.backup
+.env.local
+.env.*.local
+
+# Operating System files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# User Uploads (preserves directory structure & security config)
+/public/uploads/*
+!/public/uploads/.htaccess
+!/public/uploads/leave_docs/
+!/public/uploads/leave_docs/.gitkeep
+!/public/uploads/students/
+!/public/uploads/students/.gitkeep
+
+# Temporary / Scratch logs, test dumps, backups
+/scratch/*.log
+/scratch/*.txt
+/scratch/*.json
+/scratch/*cookie*
+
+# General logs
+*.log
