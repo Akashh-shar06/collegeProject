@@ -1,11 +1,17 @@
 <?php
 namespace App\Core;
 
+/**
+ * Session-backed CSRF token generation and validation.
+ *
+ * Never trust a token supplied by the request when the session has no token:
+ * only the application may create the expected token.
+ */
 class CSRF {
     public static function getToken(): string {
         Session::start();
         $token = Session::get('csrf_token');
-        if (!$token) {
+        if (!is_string($token) || $token === '') {
             $token = bin2hex(random_bytes(32));
             Session::set('csrf_token', $token);
         }
@@ -17,25 +23,20 @@ class CSRF {
     }
 
     public static function validate(?string $token): bool {
-        if (!$token || !is_string($token) || strlen(trim($token)) < 16) return false;
-        Session::start();
-        $sessionToken = Session::get('csrf_token');
-        if (!$sessionToken) {
-            if (Auth::check()) {
-                Session::set('csrf_token', $token);
-                return true;
-            }
+        if (!is_string($token) || $token === '') {
             return false;
         }
-        if (hash_equals($sessionToken, $token)) {
-            return true;
+
+        Session::start();
+        $sessionToken = Session::get('csrf_token');
+
+        // The expected value must already exist in the server-side session.
+        // Accepting an incoming value as the expected value enables CSRF bypass.
+        if (!is_string($sessionToken) || $sessionToken === '') {
+            return false;
         }
-        // If user is authenticated and token was sent, sync token to prevent multi-tab expiration lockouts
-        if (Auth::check()) {
-            Session::set('csrf_token', $token);
-            return true;
-        }
-        return false;
+
+        return hash_equals($sessionToken, $token);
     }
 
     public static function inputField(): string {
