@@ -36,4 +36,18 @@ class CSRFTest extends TestCase {
         $token = Session::get('csrf_token');
         $this->assertStringContainsString($token, $field);
     }
+
+    public function testValidationRejectsTokenWhenSessionTokenIsMissing(): void {
+        // An authenticated session must not be allowed to nominate its own CSRF token.
+        Session::set('user_id', 123);
+        $this->assertFalse(CSRF::validate(str_repeat('a', 64)));
+        $this->assertNull(Session::get('csrf_token'));
+    }
+
+    public function testValidationRejectsMismatchedTokenForAuthenticatedSession(): void {
+        Session::set('user_id', 123);
+        $expectedToken = CSRF::getToken();
+        $this->assertFalse(CSRF::validate(str_repeat('a', 64)));
+        $this->assertEquals($expectedToken, Session::get('csrf_token'));
+    }
 }
